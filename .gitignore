@@ -1,0 +1,38 @@
+# Go
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build outputs
+/server
+/amnezia-webui
+
+# Dependency cache
+/vendor/
+
+# SQLite / data
+/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# Env / secrets
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

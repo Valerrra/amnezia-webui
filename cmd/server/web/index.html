@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amnezia WebUI</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">
+          <img src="/static/assets/amnezia.svg" alt="Amnezia" class="logo-img" />
+        </div>
+        <div>
+          <div class="title">Amnezia WebUI</div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="monitoring-tile">
+          <div id="monitoringHeader" class="monitoring-header"></div>
+        </div>
+        <button id="restartServer" class="btn stop">Перезапустить сервер</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel protocols-panel">
+        <div class="panel-header">
+          <h2>Протоколы и сервисы</h2>
+          <span class="pill">install/remove</span>
+        </div>
+        <div class="protocols-layout">
+          <div id="protocols" class="protocols"></div>
+          <div id="portsTile" class="ports-tile">
+            <div class="ports-title">Занятые порты</div>
+            <div id="portsList" class="ports-list">Загрузка...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel containers-panel">
+        <div class="panel-header">
+          <h2>Контейнеры</h2>
+          <span id="health" class="pill">проверка...</span>
+        </div>
+        <div id="alerts" class="alerts"></div>
+        <div id="containers" class="cards"></div>
+      </section>
+
+      <section class="panel split-panel">
+        <div class="panel-header">
+          <h2>Split‑tunnel</h2>
+          <span class="pill">domains/subnets</span>
+        </div>
+        <div class="split-grid">
+          <div class="split-col">
+            <div class="split-label">Режим</div>
+            <select id="splitMode">
+              <option value="exclude">exclude (всё через VPN, кроме списка)</option>
+              <option value="include">include (только список через VPN)</option>
+            </select>
+            <div class="split-label">Домены (по одному в строке)</div>
+            <textarea id="splitDomains" class="split-text" rows="8" placeholder="example.com"></textarea>
+          </div>
+          <div class="split-col">
+            <div class="split-label">Подсети (CIDR)</div>
+            <textarea id="splitSubnets" class="split-text" rows="8" placeholder="192.168.0.0/16"></textarea>
+            <div class="split-actions">
+              <button id="splitSave" class="btn">Сохранить</button>
+              <button id="splitApply" class="btn secondary">Применить</button>
+            </div>
+            <div id="splitStatus" class="split-status"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel logs-panel">
+        <div class="panel-header">
+          <h2>Логи</h2>
+          <div class="inline">
+            <select id="logContainer"></select>
+            <button id="loadLogs" class="btn secondary">Загрузить</button>
+          </div>
+        </div>
+        <pre id="logs" class="logs">Выберите контейнер и нажмите «Загрузить»</pre>
+      </section>
+    </main>
+
+    <div id="configModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="configTitle">Конфиг</div>
+            <div class="modal-sub" id="configPath">—</div>
+          </div>
+          <button id="closeConfig" class="btn secondary">Закрыть</button>
+        </div>
+        <div id="configLines" class="config-lines"></div>
+        <div class="modal-actions">
+          <button id="addLine" class="btn secondary">Добавить строку</button>
+          <button id="saveConfig" class="btn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="installModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="installTitle">Установка</div>
+            <div class="modal-sub" id="installSub">—</div>
+          </div>
+          <button id="closeInstall" class="btn secondary">Закрыть</button>
+        </div>
+        <div id="installFields" class="config-lines"></div>
+        <div class="modal-actions">
+          <div id="installStatus" class="install-status"></div>
+          <button id="installGo" class="btn">Установить</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="exportModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="exportTitle">Экспорт</div>
+            <div class="modal-sub" id="exportPath">—</div>
+          </div>
+          <button id="closeExport" class="btn secondary">Закрыть</button>
+        </div>
+        <pre id="exportContent" class="logs"></pre>
+        <div class="modal-actions">
+          <div class="inline">
+            <button id="downloadExport" class="btn">Скачать</button>
+            <button id="copyExport" class="btn secondary">Копировать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="clientsModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="clientsTitle">Клиенты</div>
+            <div class="modal-sub" id="clientsSub">—</div>
+          </div>
+          <button id="closeClients" class="btn secondary">Закрыть</button>
+        </div>
+        <div class="clients-actions">
+          <input id="clientName" type="text" placeholder="Имя клиента" />
+          <button id="addClient" class="btn">+</button>
+        </div>
+        <div id="clientsList" class="clients-list">Загрузка...</div>
+      </div>
+    </div>
+
+    <div id="clientExportModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="clientExportTitle">Экспорт клиента</div>
+            <div class="modal-sub" id="clientExportSub">—</div>
+          </div>
+          <button id="closeClientExport" class="btn secondary">Закрыть</button>
+        </div>
+        <div class="export-actions">
+          <button id="clientExportDownload" class="btn">Скачать .vpn</button>
+          <button id="clientExportCopy" class="btn secondary">Копировать конфиг</button>
+          <button id="clientExportTelegram" class="btn secondary">Telegram</button>
+          <button id="clientExportQr" class="btn">QR</button>
+        </div>
+        <div id="clientTelegram" class="export-hint"></div>
+        <div class="export-hint">Формат .vpn содержит строку vpn:// для синхронизации с приложением.</div>
+      </div>
+    </div>
+
+    <div id="qrModal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">QR</div>
+            <div class="modal-sub" id="qrSub">—</div>
+          </div>
+          <button id="closeQr" class="btn secondary">Закрыть</button>
+        </div>
+        <div id="qrGrid" class="qr-grid"></div>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
